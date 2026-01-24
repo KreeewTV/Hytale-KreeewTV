@@ -1,0 +1,232 @@
+package at.kreeewtv.hycore.api;
+
+import com.hypixel.hytale.protocol.MaybeBool;
+import com.hypixel.hytale.server.core.Message;
+
+import java.awt.*;
+import java.util.*;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public final class ColorUtil {
+
+    /* ================= Usage ================= */
+
+       /**
+        // https://github.com/KreeewTV
+
+        player.sendMessage(ColorUtil.parse("§kTest - HelloCommand!"));
+        player.sendMessage(ColorUtil.parse("<l:https://example.com/> <g:#ff0000:#00ffff>Click me! </g></l>"));
+        player.sendMessage(ColorUtil.parse("§#ff8800Orange"));
+
+        **/
+
+    /* ================= TAGS ================= */
+
+    private static final Pattern TAG_PATTERN =
+            Pattern.compile("<(/?)([a-zA-Z0-9_]+)(?::([^>]+))?>");
+
+    private static final Pattern MC_PATTERN =
+            Pattern.compile("§(#?[0-9a-fA-F]{6}|[0-9a-fk-orA-FK-OR])");
+
+    /* ================= MC COLORS ================= */
+
+    private static final Map<Character, Color> MC_COLORS = Map.ofEntries(
+            Map.entry('0', new Color(0, 0, 0)), //BLACK
+            Map.entry('1', new Color(0, 0, 170)), // BLUE
+            Map.entry('2', new Color(0, 170, 0)), // GREEN
+            Map.entry('3', new Color(0, 170, 170)), //BONDI BLUE
+            Map.entry('4', new Color(170, 0, 0)), // RED
+            Map.entry('5', new Color(170, 0, 170)), //PURPLE
+            Map.entry('6', new Color(255, 170, 0)), //ORANGE
+            Map.entry('7', new Color(170, 170, 170)), // LIGHT GRAY
+            Map.entry('8', new Color(85, 85, 85)), //DARK GRAY
+            Map.entry('9', new Color(85, 85, 255)), //DODGER BLUE
+            Map.entry('a', new Color(85, 255, 85)), //LIGHT GREEN
+            Map.entry('b', new Color(85, 255, 255)), //LIGHT BLUE
+            Map.entry('c', new Color(255, 85, 85)), //LIGHT RED
+            Map.entry('d', new Color(255, 85, 255)), //PINK
+            Map.entry('e', new Color(255, 255, 85)), //YELLOW
+            Map.entry('f', new Color(255, 255, 255)) //WHITE
+    );
+
+    /* ================= STYLE ================= */
+
+    private record Style(
+            Color color,
+            List<Color> gradient,
+            boolean bold,
+            boolean italic,
+            boolean underline,
+            boolean mono,
+            String link
+    ) {
+        Style() {
+            this(null, null, false, false, false, false, null);
+        }
+
+        Style copy() {
+            return new Style(color, gradient, bold, italic, underline, mono, link);
+        }
+    }
+
+    /* ================= PUBLIC ================= */
+
+    public static Message parse(String input) {
+        Message root = Message.empty();
+        Deque<Style> stack = new ArrayDeque<>();
+        stack.push(new Style());
+
+        Matcher m = TAG_PATTERN.matcher(input);
+        int last = 0;
+
+        while (m.find()) {
+            if (m.start() > last) {
+                root.insert(build(input.substring(last, m.start()), stack.peek()));
+            }
+
+            boolean closing = "/".equals(m.group(1));
+            String tag = m.group(2).toLowerCase();
+            String arg = m.group(3);
+
+            if (closing) {
+                if (stack.size() > 1) stack.pop();
+            } else {
+                Style s = stack.peek().copy();
+
+                switch (tag) {
+                    //LINK <link:https://example.com/> TEXT </link>
+                    case "link", "l" -> s = new Style(s.color, s.gradient, s.bold, s.italic, s.underline, s.mono, arg);
+                    //GRADIENT <gradient:#ffaa00:#ffffff> TEXT </gradient>
+                    case "gradient", "g" -> s = new Style(null, parseGradient(arg), s.bold, s.italic, s.underline, s.mono, s.link);
+                    case "b" -> s = new Style(s.color, s.gradient, true, s.italic, s.underline, s.mono, s.link); //BOLD
+                    case "i" -> s = new Style(s.color, s.gradient, s.bold, true, s.underline, s.mono, s.link); //ITALIC
+                    case "u" -> s = new Style(s.color, s.gradient, s.bold, s.italic, true, s.mono, s.link); //UNDERLINE
+                    case "mono" -> s = new Style(s.color, s.gradient, s.bold, s.italic, s.underline, true, s.link); //MONOSPACE
+                    case "reset" -> { //RESET
+                        stack.clear();
+                        stack.push(new Style());
+                        continue;
+                    }
+                }
+                stack.push(s);
+            }
+            last = m.end();
+        }
+
+        if (last < input.length()) {
+            root.insert(build(input.substring(last), stack.peek()));
+        }
+
+        return root;
+    }
+
+    /* ================= CORE ================= */
+
+    private static Message build(String text, Style style) {
+        List<Message> parts = parseMC(text, style);
+
+        if (style.link != null) {
+            Message clickable = Message.empty().link(style.link);
+            parts.forEach(clickable::insert);
+            return clickable;
+        }
+
+        Message out = Message.empty();
+        parts.forEach(out::insert);
+        return out;
+    }
+
+    private static List<Message> parseMC(String text, Style base) {
+        List<Message> out = new ArrayList<>();
+        Matcher m = MC_PATTERN.matcher(text);
+        int last = 0;
+        Style cur = base.copy();
+
+        while (m.find()) {
+            if (m.start() > last) {
+                out.add(styled(text.substring(last, m.start()), cur));
+            }
+
+            String code = m.group(1);
+
+            if (code.startsWith("#")) {
+                cur = new Style(parseHex(code), null, cur.bold, cur.italic, cur.underline, cur.mono, cur.link);
+            } else {
+                char c = Character.toLowerCase(code.charAt(0));
+                if (MC_COLORS.containsKey(c))
+                    cur = new Style(MC_COLORS.get(c), null, cur.bold, cur.italic, cur.underline, cur.mono, cur.link);
+                else if (c == 'l') cur = new Style(cur.color, null, true, cur.italic, cur.underline, cur.mono, cur.link);
+                else if (c == 'o') cur = new Style(cur.color, null, cur.bold, true, cur.underline, cur.mono, cur.link);
+                else if (c == 'n') cur = new Style(cur.color, null, cur.bold, cur.italic, true, cur.mono, cur.link);
+                else if (c == 'r') cur = new Style();
+            }
+            last = m.end();
+        }
+
+        if (last < text.length()) {
+            out.add(styled(text.substring(last), cur));
+        }
+
+        return out;
+    }
+
+    private static Message styled(String txt, Style s) {
+        if (s.gradient != null) return gradient(txt, s);
+
+        Message m = Message.raw(txt);
+        if (s.color != null) m.color(s.color);
+        if (s.bold) m.bold(true);
+        if (s.italic) m.italic(true);
+        if (s.mono) m.monospace(true);
+        if (s.underline) m.getFormattedMessage().underlined = MaybeBool.True;
+        return m;
+    }
+
+    /* ================= GRADIENT ================= */
+
+    private static Message gradient(String text, Style s) {
+        Message c = Message.empty();
+        int len = text.length();
+
+        for (int i = 0; i < len; i++) {
+            float p = i / (float) Math.max(len - 1, 1);
+            Color col = lerp(s.gradient, p);
+            Message m = Message.raw(String.valueOf(text.charAt(i))).color(col);
+            if (s.bold) m.bold(true);
+            if (s.italic) m.italic(true);
+            if (s.mono) m.monospace(true);
+            if (s.underline) m.getFormattedMessage().underlined = MaybeBool.True;
+            c.insert(m);
+        }
+        return c;
+    }
+
+    private static List<Color> parseGradient(String arg) {
+        List<Color> list = new ArrayList<>();
+        for (String p : arg.split(":")) list.add(parseHex(p));
+        return list;
+    }
+
+    private static Color parseHex(String h) {
+        h = h.replace("#", "");
+        return new Color(
+                Integer.parseInt(h.substring(0, 2), 16),
+                Integer.parseInt(h.substring(2, 4), 16),
+                Integer.parseInt(h.substring(4, 6), 16)
+        );
+    }
+
+    private static Color lerp(List<Color> c, float t) {
+        float p = t * (c.size() - 1);
+        int i = Math.min((int) p, c.size() - 2);
+        float f = p - i;
+        Color a = c.get(i), b = c.get(i + 1);
+        return new Color(
+                (int) (a.getRed() + (b.getRed() - a.getRed()) * f),
+                (int) (a.getGreen() + (b.getGreen() - a.getGreen()) * f),
+                (int) (a.getBlue() + (b.getBlue() - a.getBlue()) * f)
+        );
+    }
+}
