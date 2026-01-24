@@ -16,7 +16,7 @@ public final class ColorUtil {
        /**
         // https://github.com/KreeewTV
 
-        player.sendMessage(ColorUtil.parse("§kTest - HelloCommand!"));
+        player.sendMessage(ColorUtil.parse("§aTest - HelloCommand!"));
         player.sendMessage(ColorUtil.parse("<l:https://example.com/> <g:#ff0000:#00ffff>Click me! </g></l>"));
         player.sendMessage(ColorUtil.parse("§#ff8800Orange"));
 
