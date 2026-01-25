@@ -1,5 +1,3 @@
-// https://github.com/KreeewTV
-
 ![Image Alt](https://github.com/KreeewTV/Hytale-KreeewTV/blob/4e38ba5f8087fb33147c64be73c4c66aadffa7a7/Codec/Codec.png)
 
 This example demonstrates a codec implementation for structured data storage.
@@ -35,6 +33,7 @@ playerData.getCoins();
 playerData.setCoins(20);
 ...
 ```
+
 
 
 
