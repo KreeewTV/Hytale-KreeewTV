@@ -36,6 +36,10 @@ playerData.setCoins(20);
 ...
 
 
+<img width="1000" height="2017" alt="image" src="https://github.com/user-attachments/assets/94348e8a-ee17-4e30-aa49-2ecb2945a064" />
+
+
+
 
 
 
