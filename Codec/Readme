@@ -1,6 +1,14 @@
 // https://github.com/KreeewTV
 
 
+This example demonstrates a codec implementation for structured data storage.
+After loading, all data is kept in memory using a HashMap, allowing very fast access as well as efficient reading, updating, and deletion of values.
+Changes are performed in RAM only and are not immediately written to disk, which prevents unnecessary and frequent write operations.
+The data is serialized and persisted only during an explicit save operation.
+This approach significantly improves performance while providing clear control over data persistence and lifecycle management.
+
+USAGE:
+
 //SAVE FILE WHENEVER YOU WANT
   try {
               PlayerStorage.save();
@@ -25,3 +33,4 @@ PlayerData playerData = PlayerStorage.get(playerRef.getUUID(), playerRef.getUser
 playerData.getCoins();
 playerData.setCoins(20);
 ...
+
