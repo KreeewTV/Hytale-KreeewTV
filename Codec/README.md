@@ -1,5 +1,6 @@
-![Image Alt](https://github.com/KreeewTV/Hytale-KreeewTV/blob/4e38ba5f8087fb33147c64be73c4c66aadffa7a7/Codec/Codec.png)
+#README 
 
+<img src="[https://example.com/bild.png](https://github.com/KreeewTV/Hytale-KreeewTV/blob/4e38ba5f8087fb33147c64be73c4c66aadffa7a7/Codec/Codec.png)" alt="Alt-Text" width="300">
 This example demonstrates a codec implementation for structured data storage.
 After loading, all data is kept in memory using a HashMap, allowing very fast access as well as efficient reading, updating, and deletion of values.
 Changes are performed in RAM only and are not immediately written to disk, which prevents unnecessary and frequent write operations.
@@ -33,6 +34,7 @@ playerData.getCoins();
 playerData.setCoins(20);
 ...
 ```
+
 
 
 
