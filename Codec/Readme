@@ -1,5 +1,6 @@
 // https://github.com/KreeewTV
 
+![Image alt](https://github.com/KreeewTV/Hytale-KreeewTV/blob/main/Codec/Codec.png?raw=true)
 
 This example demonstrates a codec implementation for structured data storage.
 After loading, all data is kept in memory using a HashMap, allowing very fast access as well as efficient reading, updating, and deletion of values.
@@ -33,4 +34,5 @@ PlayerData playerData = PlayerStorage.get(playerRef.getUUID(), playerRef.getUser
 playerData.getCoins();
 playerData.setCoins(20);
 ...
+
 
