@@ -1,0 +1,27 @@
+// https://github.com/KreeewTV
+
+
+//SAVE FILE WHENEVER YOU WANT
+  try {
+              PlayerStorage.save();
+          } catch (IOException e) {
+              throw new RuntimeException(e);
+          }
+
+//LOAD FILE - IMPORTANT LOAD ON SETUP!
+  try {
+            PlayerStorage.load();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+//CREATE PLAYER IF NOT EXISTS
+PlayerStorage.createIfNotExists(playerRef.getUuid(), playerRef.getUsername(), 20, "de_DE");
+
+//Get Data from Player in Json
+PlayerData playerData = PlayerStorage.get(playerRef.getUUID(), playerRef.getUsername());
+
+//Get Data specific
+playerData.getCoins();
+playerData.setCoins(20);
+...
