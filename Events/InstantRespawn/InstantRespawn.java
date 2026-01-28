@@ -30,12 +30,12 @@ public class InstantRespawn extends DeathSystems.OnDeathSystem {
 
     @Override
     public void onComponentAdded(@Nonnull Ref ref, @Nonnull DeathComponent component, @Nonnull Store store, @Nonnull CommandBuffer commandBuffer) {
-        Player playerComponent = (Player) store.getComponent(ref, Player.getComponentType());
-
-        assert playerComponent != null;
-        Universe.get().sendMessage(ColorUtil.parse("§7Death player: §c" + playerComponent.getDisplayName()));
-
+        
         PlayerRef playerRefComponent = (PlayerRef) commandBuffer.getComponent(ref, PlayerRef.getComponentType());
+        
+        Universe.get().sendMessage(ColorUtil.parse("§7Death player: §c" + playerRefComponent.getUsername()));
+
+        Player playerComponent = (Player) store.getComponent(ref, Player.getComponentType());
 
         Damage deathInfo = component.getDeathInfo();
         Message deathMessage = deathInfo != null ? deathInfo.getDeathMessage(ref, commandBuffer) : null;
@@ -81,6 +81,7 @@ public class InstantRespawn extends DeathSystems.OnDeathSystem {
     public Query<EntityStore> getQuery() {
         return Query.any();
     }
+
 
 
 }
