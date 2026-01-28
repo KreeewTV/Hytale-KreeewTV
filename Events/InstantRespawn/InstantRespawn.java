@@ -79,9 +79,10 @@ public class InstantRespawn extends DeathSystems.OnDeathSystem {
     @NullableDecl
     @Override
     public Query<EntityStore> getQuery() {
-        return Query.any();
+        return Query.and(PlayerRef.getComponentType());
     }
 
 
 
 }
+
