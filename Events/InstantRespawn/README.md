@@ -1,4 +1,4 @@
-# Instant Respawn 28.01.2026 20:28 DONT USE THIS CODE (BUG) SERVER FREEZE or Player is Invalid
+# Instant Respawn
 
 **Instant Respawn** allows players to respawn immediately after death, without a death screen or delay.  
 This keeps gameplay fast and uninterrupted, making it ideal for PvP servers, minigames, arenas, and testing environments.
