@@ -9,6 +9,9 @@ Java version.
 tasks.withType(JavaCompile).configureEach {
     options.compilerArgs += ["-Xlint:-removal"]
 }
+```
+<img width="1793" height="186" alt="image" src="https://github.com/user-attachments/assets/4f2e769d-e429-4842-a3cd-99b9b4036f23" />
+
 
 
 
