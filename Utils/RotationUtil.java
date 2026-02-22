@@ -15,14 +15,15 @@ public final class RotationUtil {
       -> also possible 
       playerRef.getHeadRotation().getPitch();
       playerRef.getHeadRotation().getYaw();
-      
-      var pitchHead = headRotationComponent.getRotation().x;  
-      var yawHead = headRotationComponent.getRotation().y;  
-      var zHead = headRotationComponent.getRotation().z;  
+
+      //GET THE ORIENTATION ROTATION
+        var xH = RotationUtil.radiansToDegrees(headRotationComponent.getRotation().x);
+        var yH = RotationUtil.radiansToDegrees(headRotationComponent.getRotation().y);
+        var zH = RotationUtil.radiansToDegrees(headRotationComponent.getRotation().z);
 
       Vector3d vector3dLoc = new Vector3d(0,0,0);
       Vector3f vector3fBodyPos = new Vector3f(0,0,0);
-      Vector3f vector3fHeadPos = new Vector3f(pitchHead,yawHead,zHead);
+      Vector3f vector3fHeadPos = new Vector3f(80,-5,0); // ORIENTATION ROTATION -> RotationUtil.degreesToRadians(vector3fHeadPos) to Radians
       Teleport teleport = Teleport.createExact(vector3dLoc, vector3fBodyPos, RotationUtil.degreesToRadians(vector3fHeadPos));
 
         **/
